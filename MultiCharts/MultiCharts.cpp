@@ -1,21 +1,443 @@
-// MultiCharts.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include "pch.h"
-#include <iostream>
+#include "Python.h"
+#include "MultiCharts.h"
+#include "pyhelper.hpp"
+#include "string"
 
-int main()
+// Creating a Python Instance
+CPyInstance pyInstance;
+MultiCharts::MultiCharts() { }
+
+MultiCharts::~MultiCharts() { }
+
+/*
+
+		--Member Functions--
+
+*/
+
+void MultiCharts::DisposeMultiCharts()
 {
-    std::cout << "Hello World!\n"; 
+	if ((bool)Py_IsInitialized)
+	{
+		int _ = Py_FinalizeEx();
+		Py_Finalize();
+	}
+
+	if (trainingData != NULL)
+	{
+		delete[] trainingData;
+		trainingData = NULL;
+	}
+
+	if (dateArray != NULL)
+	{
+		delete[] dateArray;
+		dateArray = NULL;
+	}
+
+	if (testingData != NULL)
+	{
+		delete[] testingData;
+		testingData = NULL;
+	}
+
+	if (testDateArray != NULL)
+	{
+		delete[] testDateArray;
+		testDateArray = NULL;
+	}
+
+	if (fileName != NULL)
+	{
+		delete[] fileName;
+		fileName = NULL;
+	}
+
+	if (volumeArray != NULL)
+	{
+		delete[] volumeArray;
+		volumeArray = NULL;
+	}
+
+	if (this != NULL)
+	{
+		delete this;
+	}
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
+void MultiCharts::InitTrainingData(int size)
+{
+	this->trainingDataSize = size;
+	this->trainingData = new double[size];
+}
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+void MultiCharts::SetTrainingData(double *trainingData)
+{
+	this->trainingData = trainingData;
+	//for (int i = 0; i < trainingDataSize; i++)
+//	{
+	//	this->trainingData[i] = trainingData[i];
+	//}
+	//delete trainingData;
+//	trainingData = NULL;
+}
+
+void MultiCharts::InitTestingData(int size)
+{
+	this->testingDataSize = size;
+	this->testingData = new double[size];
+}
+
+void MultiCharts::SetTestingData(double *testingData)
+{
+	for (int i = 0; i < testingDataSize; i++)
+	{
+		this->testingData[i] = testingData[i];
+	}
+	//delete testingData;
+	testingData = NULL;
+}
+
+void MultiCharts::InitDateArray(int size)
+{
+	this->dateArraySize = size;
+	this->dateArray = new char[size][DATE_SIZE];
+}
+
+void MultiCharts::SetDateArray(char *dateArray)
+{
+
+	for (int i = 0, k = 0; i < dateArraySize; i++, k += DATE_SIZE - 1)
+	{
+		for (int j = 0; j < DATE_SIZE - 1; j++)
+		{
+			this->dateArray[i][j] = dateArray[j + k];
+		}
+		this->dateArray[i][DATE_SIZE - 1] = '\0';
+	}
+	//delete dateArray;
+	//dateArray = NULL;
+}
+
+void MultiCharts::InitTestDateArray(int size)
+{
+	this->testDateArraySize = size;
+	this->testDateArray = new char[size][DATE_SIZE];
+}
+
+void MultiCharts::SetTestDateArray(char *testDateArray)
+{
+	for (int i = 0, k = 0; i < testDateArraySize; i++, k += DATE_SIZE - 1)
+	{
+		for (int j = 0; j < DATE_SIZE - 1; j++)
+		{
+			this->testDateArray[i][j] = testDateArray[j + k];
+		}
+		this->testDateArray[i][DATE_SIZE - 1] = '\0';
+	}
+	//delete testDateArray;
+	testDateArray = NULL;
+}
+
+void MultiCharts::InitVolumeArray(int size)
+{
+	this->volumeArraySize = size;
+	this->volumeArray = new long[size];
+}
+
+void MultiCharts::SetVolumeArray(long* volume)
+{
+	this->volumeArray = volume;
+	//delete[] volume;
+	//volume = NULL;
+}
+
+void MultiCharts::InitFileName(int size)
+{
+	this->fileNameSize = size;
+	this->fileName = new char[size];
+}
+
+void MultiCharts::SetFileName(char* fileName)
+{
+	for (int i = 0; i < fileNameSize; i++)
+	{
+		this->fileName[i] = fileName[i];
+	}
+	fileName[fileNameSize] = '\0';
+}
+
+void MultiCharts::SetLearningRate(double learningRate)
+{
+	this->learningRate = learningRate;
+}
+
+void MultiCharts::SetEpochs(int epochs)
+{
+	this->epochs = epochs;
+}
+
+void MultiCharts::SetScale(int scale)
+{
+	this->scale = scale;
+}
+
+void MultiCharts::SetOptimizer(int optimizer)
+{
+	this->optimizer = optimizer;
+}
+
+void MultiCharts::SetMomentum(int momentum)
+{
+	this->momentum = momentum;
+}
+
+void MultiCharts::SetTestingPart(double testingPart)
+{
+	this->testingPart = testingPart;
+}
+
+void MultiCharts::SetTestingWeight(double testingWeight)
+{
+	this->testingWeight = testingWeight;
+}
+
+double MultiCharts::TrainModel()
+{
+	// Importing the .py module
+	CPyObject pModule = PyImport_ImportModule("build");
+
+	PyGILState_STATE gstate = PyGILState_Ensure();
+
+	if (pModule)
+	{
+		// Importing the Train Function
+		CPyObject pFunc = PyObject_GetAttrString(pModule, "train");
+
+		if (pFunc && PyCallable_Check(pFunc))
+		{
+			// Creating PyObjects Parameters for Train Function
+
+			// Python Lists for Training Data Values and Dates
+			CPyObject pTrainingData = PyList_New(0);
+			CPyObject pDate = PyList_New(0);
+
+			for (int i = 0; i < trainingDataSize; i++)
+			{
+				char* dateAtPosI = new char[DATE_SIZE];
+				for (int j = 0; j < DATE_SIZE - 1; j++)
+				{
+					dateAtPosI[j] = dateArray[i][j];
+				}
+				dateAtPosI[DATE_SIZE - 1] = '\0';
+				std::string date(dateAtPosI);
+				const char* c = date.c_str();
+				delete[] dateAtPosI;
+
+				CPyObject pTrainEle = PyFloat_FromDouble(trainingData[i]);
+				CPyObject pDateEle = PyUnicode_FromFormat("%s", c);
+
+				PyList_Append(pTrainingData, pTrainEle);
+				PyList_Append(pDate, pDateEle);
+			}
+
+			std::string fileNameString(fileName, fileNameSize);
+			const char* d = fileNameString.c_str();
+
+			CPyObject pLearningRate = PyFloat_FromDouble(learningRate);
+			CPyObject pScale = Py_BuildValue("i", scale);
+			CPyObject pEpochs = Py_BuildValue("i", epochs);
+			CPyObject pMomentum = Py_BuildValue("i", momentum);
+			CPyObject pOptimizer = Py_BuildValue("i", optimizer);
+			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
+
+			if (pTrainingData && pDate && pLearningRate && pScale && pEpochs && pMomentum && pOptimizer && pFileName)
+			{
+				// Receiving return value from the Train Function
+				CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pTrainingData, pDate, pLearningRate, pScale, pEpochs, pMomentum, pOptimizer, pFileName, NULL);
+
+				if (pValue)
+				{
+					double returnVal = PyFloat_AsDouble(pValue);
+					PyGILState_Release(gstate);
+					return returnVal;
+				}
+				else
+				{
+					PyGILState_Release(gstate);
+					return 1.01;
+				}
+			}
+			else
+			{
+				PyGILState_Release(gstate);
+				return 2.01;
+			}
+		}
+		else
+		{
+			PyGILState_Release(gstate);
+			return 3.01;
+		}
+	}
+	else
+	{
+		PyGILState_Release(gstate);
+		return 4.01;
+	}
+}
+
+double MultiCharts::TestModel()
+{
+	// Importing the .py module
+	CPyObject pModule = PyImport_ImportModule("build");
+
+	PyGILState_STATE gstate = PyGILState_Ensure();
+
+	if (pModule)
+	{
+		// Importing the Test Function
+		CPyObject pFunc = PyObject_GetAttrString(pModule, "test");
+
+		if (pFunc && PyCallable_Check(pFunc))
+		{
+			// Creating PyObjects Parameters for Test Function
+
+			//Python Lists for Test Data Values and Dates
+			CPyObject pTestingData = PyList_New(0);
+			CPyObject pDate = PyList_New(0);
+
+			for (int i = 0; i < testingDataSize; i++)
+			{
+				char* dateAtPosI = new char[DATE_SIZE];
+				for (int j = 0; j < DATE_SIZE - 1; j++)
+				{
+					dateAtPosI[j] = testDateArray[i][j];
+				}
+				dateAtPosI[DATE_SIZE - 1] = '\0';
+				std::string date(dateAtPosI);
+				const char* c = date.c_str();
+				delete[] dateAtPosI;
+
+				CPyObject pTestEle = PyFloat_FromDouble(testingData[i]);
+				CPyObject pDateEle = PyUnicode_FromFormat("%s", c);
+
+				PyList_Append(pTestingData, pTestEle);
+				PyList_Append(pDate, pDateEle);
+			}
+
+			std::string fileNameString(fileName, fileNameSize);
+			const char* d = fileNameString.c_str();
+
+			CPyObject pTestingWeight = PyFloat_FromDouble(testingWeight);
+			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
+
+			if (pTestingData && pDate && pTestingWeight && pFileName)
+			{
+				// Receiving return value from the Test Function
+				CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pTestingData, pDate, pTestingWeight, pFileName, NULL);
+
+				if (pValue)
+				{
+					double returnVal = PyFloat_AsDouble(pValue);
+					PyGILState_Release(gstate);
+					return returnVal;
+				}
+				else
+				{
+					PyGILState_Release(gstate);
+					return 0.01;
+				}
+			}
+			else
+			{
+				PyGILState_Release(gstate);
+				return 0.02;
+			}
+		}
+		else
+		{
+			PyGILState_Release(gstate);
+			return 0.03;
+		}
+	}
+	else
+	{
+		PyGILState_Release(gstate);
+		return 0.04;
+	}
+}
+
+double* MultiCharts::Predict(int ticks)
+{
+	// Importing the .py module
+	CPyObject pModule = PyImport_ImportModule("build");
+
+	PyGILState_STATE gstate = PyGILState_Ensure();
+
+	if (pModule)
+	{
+		// Importing the Predict Function
+		CPyObject pFunc = PyObject_GetAttrString(pModule, "predict");
+
+		if (pFunc && PyCallable_Check(pFunc))
+		{
+			// Creating PyObjects Parameters for Predict Function
+
+			std::string fileNameString(fileName, fileNameSize);
+			const char* d = fileNameString.c_str();
+
+			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
+			CPyObject pTicks = Py_BuildValue("i", ticks);
+
+			if (pFileName && pTicks)
+			{
+				// Receiving return value from the Predict Function
+				CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pFileName, pTicks, NULL);
+
+				if (pValue)
+				{
+					if (PyList_Check(pValue))
+					{
+						int count = (int)PyList_Size(pValue);
+
+						double* predictions = new double[count];
+						CPyObject pTemp;
+
+						for (int i = 0; i < count; i++)
+						{
+							pTemp = PyList_GetItem(pValue, i);
+							predictions[i] = PyFloat_AsDouble(pTemp);
+						}
+
+						PyGILState_Release(gstate);
+
+						//double* predictions = new double[ticks]{ 1.1, 2.01, 3.22, 4.1, 5.09 };
+						return predictions;
+					}
+					else
+					{
+						return NULL;
+					}
+				}
+				else
+				{
+					return NULL;
+				}
+			}
+			else
+			{
+				return NULL;
+			}
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+	else
+	{
+		return NULL;
+	}
+}
