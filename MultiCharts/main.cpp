@@ -33,7 +33,7 @@ int main()
 	multiCharts->SetOptimizer(0);
 	multiCharts->SetMomentum(10);
 
-	cout << multiCharts->dateArrayUNIX[21];
+	cout << multiCharts->dateArrayUNIX[21] << endl;
 
 	cout << multiCharts->TrainModel();
 

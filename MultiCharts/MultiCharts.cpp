@@ -4,7 +4,7 @@
 #include "pyhelper.hpp"
 #include "string"
 
-// Creating a Python Instance
+//Creating a Python Instance
 CPyInstance pyInstance;
 
 MultiCharts::MultiCharts() { }
@@ -219,17 +219,17 @@ void MultiCharts::SetTestingWeight(double testingWeight)
 }
 
 double MultiCharts::TrainModel()
-{
+{	
 	// Importing the .py module
 	CPyObject pModule = PyImport_ImportModule("build");
-
+	
 	PyGILState_STATE gstate = PyGILState_Ensure();
 
 	if (pModule)
 	{
 		// Importing the Train Function
 		CPyObject pFunc = PyObject_GetAttrString(pModule, "train");
-
+		
 		if (pFunc && PyCallable_Check(pFunc))
 		{
 			// Creating PyObjects Parameters for Train Function
@@ -250,10 +250,10 @@ double MultiCharts::TrainModel()
 				const char* c = date.c_str();
 				delete[] dateAtPosI;
 				*/
-
+				
 				CPyObject pTrainEle = PyFloat_FromDouble(trainingData[i]);
 				CPyObject pDateEle = PyUnicode_FromFormat("%lli", dateArrayUNIX[i]);
-
+				
 				PyList_Append(pTrainingData, pTrainEle);
 				PyList_Append(pDate, pDateEle);
 			}
@@ -267,7 +267,7 @@ double MultiCharts::TrainModel()
 			CPyObject pMomentum = Py_BuildValue("i", momentum);
 			CPyObject pOptimizer = Py_BuildValue("i", optimizer);
 			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
-
+			
 			if (pTrainingData && pDate && pLearningRate && pScale && pEpochs && pMomentum && pOptimizer && pFileName)
 			{
 				// Receiving return value from the Train Function

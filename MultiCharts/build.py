@@ -1,29 +1,29 @@
 # Python Build for training, testing and exporting model
 
-import numpy as np
-import pandas as pd
-import tensorflow as tf
-import pickle
+#import numpy as np
+#import pandas as pd
+#import tensorflow as tf
+#import pickle
 
-from datetime import datetime
+#from datetime import datetime
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, LSTM, Dropout, GRU, Bidirectional
-from tensorflow.keras.optimizers import SGD, RMSprop
-from tensorflow.keras.models import load_model
-from tensorflow.keras import backend as K
+#from tensorflow.keras.models import Sequential
+#from tensorflow.keras.layers import Dense, LSTM, Dropout, GRU, Bidirectional
+#from tensorflow.keras.optimizers import SGD, RMSprop
+#from tensorflow.keras.models import load_model
+#from tensorflow.keras import backend as K
 
-from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import MinMaxScaler  
+#from sklearn.metrics import mean_squared_error
+#from sklearn.preprocessing import MinMaxScaler  
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 # Just disables the warning, doesn't enable AVX/FMA
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+#import os
+#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Suppressing deprecated warnings
-tf.logging.set_verbosity(tf.logging.ERROR)
+#tf.logging.set_verbosity(tf.logging.ERROR)
 
 window_size = 60
 
@@ -98,40 +98,7 @@ def r2_score(y_true, y_pred):
     
 def train(training_set, unix_date, lr, scale, epochs, momentum, optimizer, file_name):
     if(type(training_set) == list):
-        
-        #Converting unix dates to DateTime
-        date = [datetime.fromtimestamp(unix) for unix in unix_date]
-        
-        # Constructing a pandas dataframe for reusability and reference
-        df = pd.DataFrame(data = training_set, columns = ['Feature'], index = pd.to_datetime(date))
-        df.index.names = ['Date']
-        df.index = pd.to_datetime(df.index)
-        df.to_csv(file_name + '.csv')
-
-        training_set = df.values
-
-        # Scaling and preprocessing the training set
-        X_train, Y_train = getScaledData(training_set, scale, file_name)
-        
-        # Constructing a stacked LSTM Sequential Model
-        regressor = getLSTMSequential(X_train)
-
-        # Compiling the RNN
-        regressor.compile(optimizer=getOptimizer(optimizer, lr, momentum), loss='mean_squared_error', metrics=['mse',r2_score])
-        
-        # Fitting to the training set
-        regressor.fit(X_train, Y_train,epochs = epochs,batch_size=32)
-
-        #Saving trained model
-        regressor.save(file_name + '.h5')
-
-        #Deleting model instance
-        del regressor
-
-        return 100
-    
-    else:
-        return 110
+        return 12.21
 
 def test(testing_set, date, testing_weight, file_name):
     if(type(testing_set) == list):
