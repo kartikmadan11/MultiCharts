@@ -6,6 +6,7 @@
 
 // Creating a Python Instance
 CPyInstance pyInstance;
+
 MultiCharts::MultiCharts() { }
 
 MultiCharts::~MultiCharts() { }
@@ -74,11 +75,11 @@ void MultiCharts::InitTrainingData(int size)
 
 void MultiCharts::SetTrainingData(double *trainingData)
 {
-	this->trainingData = trainingData;
-	//for (int i = 0; i < trainingDataSize; i++)
-//	{
-	//	this->trainingData[i] = trainingData[i];
-	//}
+	//this->trainingData = trainingData;
+	for (int i = 0; i < trainingDataSize; i++)
+	{
+		this->trainingData[i] = trainingData[i];
+	}
 	//delete trainingData;
 //	trainingData = NULL;
 }
@@ -97,6 +98,20 @@ void MultiCharts::SetTestingData(double *testingData)
 	}
 	//delete testingData;
 	testingData = NULL;
+}
+
+void MultiCharts::InitDateArrayUNIX(int size)
+{
+	this->dateArrayUNIXSize = size;
+	this->dateArrayUNIX = new long long[size];
+}
+
+void MultiCharts::SetDateArrayUNIX(long long * dateArray)
+{
+	for (int i = 0; i < dateArrayUNIXSize; i++)
+	{
+		this->dateArrayUNIX[i] = dateArray[i];
+	}
 }
 
 void MultiCharts::InitDateArray(int size)
@@ -225,18 +240,19 @@ double MultiCharts::TrainModel()
 
 			for (int i = 0; i < trainingDataSize; i++)
 			{
-				char* dateAtPosI = new char[DATE_SIZE];
+				/*char* dateAtPosI = new char[DATE_SIZE];
 				for (int j = 0; j < DATE_SIZE - 1; j++)
 				{
 					dateAtPosI[j] = dateArray[i][j];
 				}
-				dateAtPosI[DATE_SIZE - 1] = '\0';
+				//dateAtPosI[DATE_SIZE - 1] = '\0';
 				std::string date(dateAtPosI);
 				const char* c = date.c_str();
 				delete[] dateAtPosI;
+				*/
 
 				CPyObject pTrainEle = PyFloat_FromDouble(trainingData[i]);
-				CPyObject pDateEle = PyUnicode_FromFormat("%s", c);
+				CPyObject pDateEle = PyUnicode_FromFormat("%lli", dateArrayUNIX[i]);
 
 				PyList_Append(pTrainingData, pTrainEle);
 				PyList_Append(pDate, pDateEle);

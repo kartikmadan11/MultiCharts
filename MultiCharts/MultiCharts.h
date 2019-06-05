@@ -4,11 +4,15 @@ constexpr auto DATE_SIZE = 11;
 
 public class MultiCharts
 {
+public:
 	double* trainingData;
 	int trainingDataSize;
 
 	double* testingData;
 	int testingDataSize;
+	
+	long long* dateArrayUNIX;
+	int dateArrayUNIXSize;
 	
 	char(*dateArray)[DATE_SIZE];
 	int dateArraySize;
@@ -29,7 +33,7 @@ public class MultiCharts
 	int momentum;
 	double testingPart;
 	double testingWeight;
-public:
+
 	MultiCharts();
 	~MultiCharts();
 	void DisposeMultiCharts();
@@ -39,6 +43,9 @@ public:
 
 	void InitTestingData(int size);
 	void SetTestingData(double* testingData);
+
+	void InitDateArrayUNIX(int size);
+	void SetDateArrayUNIX(long long *dateArray);
 
 	void InitDateArray(int size);
 	void SetDateArray(char *dateArray);
