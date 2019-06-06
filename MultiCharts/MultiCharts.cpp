@@ -81,7 +81,7 @@ void MultiCharts::SetTrainingData(double *trainingData)
 		this->trainingData[i] = trainingData[i];
 	}
 	//delete trainingData;
-//	trainingData = NULL;
+	//	trainingData = NULL;
 }
 
 void MultiCharts::InitTestingData(int size)
@@ -220,88 +220,89 @@ void MultiCharts::SetTestingWeight(double testingWeight)
 
 double MultiCharts::TrainModel()
 {	
-	// Importing the .py module
-	CPyObject pModule = PyImport_ImportModule("build");
-	
-	PyGILState_STATE gstate = PyGILState_Ensure();
+	//// Importing the .py module
+	//CPyObject pModule = PyImport_ImportModule("build");
+	//
+	//PyGILState_STATE gstate = PyGILState_Ensure();
 
-	if (pModule)
-	{
-		// Importing the Train Function
-		CPyObject pFunc = PyObject_GetAttrString(pModule, "train");
-		
-		if (pFunc && PyCallable_Check(pFunc))
-		{
-			// Creating PyObjects Parameters for Train Function
+	//if (pModule)
+	//{
+	//	// Importing the Train Function
+	//	CPyObject pFunc = PyObject_GetAttrString(pModule, "train");
+	//	
+	//	if (pFunc && PyCallable_Check(pFunc))
+	//	{
+	//		// Creating PyObjects Parameters for Train Function
 
-			// Python Lists for Training Data Values and Dates
-			CPyObject pTrainingData = PyList_New(0);
-			CPyObject pDate = PyList_New(0);
+	//		// Python Lists for Training Data Values and Dates
+	//		CPyObject pTrainingData = PyList_New(0);
+	//		CPyObject pDate = PyList_New(0);
 
-			for (int i = 0; i < trainingDataSize; i++)
-			{
-				/*char* dateAtPosI = new char[DATE_SIZE];
-				for (int j = 0; j < DATE_SIZE - 1; j++)
-				{
-					dateAtPosI[j] = dateArray[i][j];
-				}
-				//dateAtPosI[DATE_SIZE - 1] = '\0';
-				std::string date(dateAtPosI);
-				const char* c = date.c_str();
-				delete[] dateAtPosI;
-				*/
-				
-				CPyObject pTrainEle = PyFloat_FromDouble(trainingData[i]);
-				CPyObject pDateEle = PyUnicode_FromFormat("%lli", dateArrayUNIX[i]);
-				
-				PyList_Append(pTrainingData, pTrainEle);
-				PyList_Append(pDate, pDateEle);
-			}
+	//		for (int i = 0; i < trainingDataSize; i++)
+	//		{
+	//			/*char* dateAtPosI = new char[DATE_SIZE];
+	//			for (int j = 0; j < DATE_SIZE - 1; j++)
+	//			{
+	//				dateAtPosI[j] = dateArray[i][j];
+	//			}
+	//			//dateAtPosI[DATE_SIZE - 1] = '\0';
+	//			std::string date(dateAtPosI);
+	//			const char* c = date.c_str();
+	//			delete[] dateAtPosI;
+	//			*/
+	//			
+	//			CPyObject pTrainEle = PyFloat_FromDouble(trainingData[i]);
+	//			CPyObject pDateEle = PyUnicode_FromFormat("%lli", dateArrayUNIX[i]);
+	//			
+	//			PyList_Append(pTrainingData, pTrainEle);
+	//			PyList_Append(pDate, pDateEle);
+	//		}
 
-			std::string fileNameString(fileName, fileNameSize);
-			const char* d = fileNameString.c_str();
+	//		std::string fileNameString(fileName, fileNameSize);
+	//		const char* d = fileNameString.c_str();
 
-			CPyObject pLearningRate = PyFloat_FromDouble(learningRate);
-			CPyObject pScale = Py_BuildValue("i", scale);
-			CPyObject pEpochs = Py_BuildValue("i", epochs);
-			CPyObject pMomentum = Py_BuildValue("i", momentum);
-			CPyObject pOptimizer = Py_BuildValue("i", optimizer);
-			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
-			
-			if (pTrainingData && pDate && pLearningRate && pScale && pEpochs && pMomentum && pOptimizer && pFileName)
-			{
-				// Receiving return value from the Train Function
-				CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pTrainingData, pDate, pLearningRate, pScale, pEpochs, pMomentum, pOptimizer, pFileName, NULL);
+	//		CPyObject pLearningRate = PyFloat_FromDouble(learningRate);
+	//		CPyObject pScale = Py_BuildValue("i", scale);
+	//		CPyObject pEpochs = Py_BuildValue("i", epochs);
+	//		CPyObject pMomentum = Py_BuildValue("i", momentum);
+	//		CPyObject pOptimizer = Py_BuildValue("i", optimizer);
+	//		CPyObject pFileName = PyUnicode_FromFormat("%s", d);
+	//		
+	//		if (pTrainingData && pDate && pLearningRate && pScale && pEpochs && pMomentum && pOptimizer && pFileName)
+	//		{
+	//			// Receiving return value from the Train Function
+	//			CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pTrainingData, pDate, pLearningRate, pScale, pEpochs, pMomentum, pOptimizer, pFileName, NULL);
 
-				if (pValue)
-				{
-					double returnVal = PyFloat_AsDouble(pValue);
-					PyGILState_Release(gstate);
-					return returnVal;
-				}
-				else
-				{
-					PyGILState_Release(gstate);
-					return 1.01;
-				}
-			}
-			else
-			{
-				PyGILState_Release(gstate);
-				return 2.01;
-			}
-		}
-		else
-		{
-			PyGILState_Release(gstate);
-			return 3.01;
-		}
-	}
-	else
-	{
-		PyGILState_Release(gstate);
-		return 4.01;
-	}
+	//			if (pValue)
+	//			{
+	//				double returnVal = PyFloat_AsDouble(pValue);
+	//				PyGILState_Release(gstate);
+	//				return returnVal;
+	//			}
+	//			else
+	//			{
+	//				PyGILState_Release(gstate);
+	//				return 1.01;
+	//			}
+	//		}
+	//		else
+	//		{
+	//			PyGILState_Release(gstate);
+	//			return 2.01;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		PyGILState_Release(gstate);
+	//		return 3.01;
+	//	}
+	//}
+	//else
+	//{
+	//	PyGILState_Release(gstate);
+	//	return 4.01;
+	//}
+	return double(dateArrayUNIXSize);
 }
 
 double MultiCharts::TestModel()

@@ -1,29 +1,29 @@
 # Python Build for training, testing and exporting model
 
-#import numpy as np
-#import pandas as pd
-#import tensorflow as tf
-#import pickle
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import pickle
 
-#from datetime import datetime
+from datetime import datetime
 
-#from tensorflow.keras.models import Sequential
-#from tensorflow.keras.layers import Dense, LSTM, Dropout, GRU, Bidirectional
-#from tensorflow.keras.optimizers import SGD, RMSprop
-#from tensorflow.keras.models import load_model
-#from tensorflow.keras import backend as K
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM, Dropout, GRU, Bidirectional
+from tensorflow.keras.optimizers import SGD, RMSprop
+from tensorflow.keras.models import load_model
+from tensorflow.keras import backend as K
 
-#from sklearn.metrics import mean_squared_error
-#from sklearn.preprocessing import MinMaxScaler  
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import MinMaxScaler  
 
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # Just disables the warning, doesn't enable AVX/FMA
-#import os
-#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Suppressing deprecated warnings
-#tf.logging.set_verbosity(tf.logging.ERROR)
+tf.logging.set_verbosity(tf.logging.ERROR)
 
 window_size = 60
 
