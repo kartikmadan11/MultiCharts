@@ -23,7 +23,7 @@ int main()
 	multiCharts->InitDateArrayUNIX(65);
 	multiCharts->SetDateArrayUNIX(unix_dates);
 
-	char* fileName = new char[4]{ "abc" };
+	char* fileName = new char[4]{"abc"};
 	multiCharts->InitFileName(4);
 	multiCharts->SetFileName(fileName);
 

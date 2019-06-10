@@ -249,7 +249,7 @@ double MultiCharts::TrainModel()
 				std::string date(dateAtPosI);
 				const char* c = date.c_str();
 				delete[] dateAtPosI;
-				*/
+				*/		
 				
 				CPyObject pTrainEle = PyFloat_FromDouble(trainingData[i]);
 				CPyObject pDateEle = PyUnicode_FromFormat("%lli", dateArrayUNIX[i]);
