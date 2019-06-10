@@ -99,7 +99,6 @@ def r2_score(y_true, y_pred):
 def train(training_set, unix_date, lr, scale, epochs, momentum, optimizer, file_name):
     if(type(training_set) == list and type(unix_date) == list and file_name == 'modelLSTM' and len(training_set) == 1000 and type(unix_date[0]) == str):
 
-
         #Converting unix dates to DateTime
         date = [datetime.fromtimestamp(float(unix)) for unix in unix_date]
         
