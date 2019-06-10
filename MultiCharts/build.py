@@ -97,8 +97,41 @@ def r2_score(y_true, y_pred):
     return ( 1 - SS_res/(SS_tot + K.epsilon()) )
     
 def train(training_set, unix_date, lr, scale, epochs, momentum, optimizer, file_name):
-    if(type(training_set) == list):
-        return 12.21
+    if(type(training_set) == list and type(unix_date) == list and file_name == 'modelLSTM' and len(training_set) == 1000 and type(unix_date[0]) == str):
+
+
+        #Converting unix dates to DateTime
+        date = [datetime.fromtimestamp(float(unix)) for unix in unix_date]
+        
+        # Constructing a pandas dataframe for reusability and reference
+        df = pd.DataFrame(data = training_set, columns = ['Feature'], index = pd.to_datetime(date))
+        df.index.names = ['Date']
+        df.index = pd.to_datetime(df.index)
+        df.to_csv(file_name + '.csv')
+
+        training_set = df.values
+
+        # Scaling and preprocessing the training set
+        X_train, Y_train = getScaledData(training_set, scale, file_name)
+        
+        # Constructing a stacked LSTM Sequential Model
+        regressor = getLSTMSequential(X_train)
+
+        # Compiling the RNN
+        regressor.compile(optimizer=getOptimizer(optimizer, lr, momentum), loss='mean_squared_error', metrics=['mse',r2_score])
+            
+        # Fitting to the training set
+        regressor.fit(X_train, Y_train,epochs = epochs,batch_size=32)
+
+        #Saving trained model
+        regressor.save(file_name + '.h5')
+
+        #Deleting model instance
+        del regressor
+
+        return 100    
+    else:
+        return 110
 
 def test(testing_set, date, testing_weight, file_name):
     if(type(testing_set) == list):
