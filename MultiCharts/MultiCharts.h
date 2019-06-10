@@ -1,7 +1,5 @@
 #include "pch.h"
 
-constexpr auto DATE_SIZE = 11;
-
 public class MultiCharts
 {
 public:
@@ -13,13 +11,10 @@ public:
 	
 	long long* dateArrayUNIX;
 	int dateArrayUNIXSize;
+
+	long long *testDateArrayUNIX;
+	int testDateArrayUNIXSize;
 	
-	char(*dateArray)[DATE_SIZE];
-	int dateArraySize;
-
-	char(*testDateArray)[DATE_SIZE];
-	int testDateArraySize;
-
 	long* volumeArray;
 	int volumeArraySize;
 
@@ -47,11 +42,8 @@ public:
 	void InitDateArrayUNIX(int size);
 	void SetDateArrayUNIX(long long *dateArray);
 
-	void InitDateArray(int size);
-	void SetDateArray(char *dateArray);
-
-	void InitTestDateArray(int size);
-	void SetTestDateArray(char *testDateArray);
+	void InitTestDateArrayUNIX(int size);
+	void SetTestDateArrayUNIX(long long *testDateArray);
 
 	void InitVolumeArray(int size);
 	void SetVolumeArray(long* volume);
@@ -70,5 +62,4 @@ public:
 	double TrainModel();
 	double TestModel();
 	double* Predict(int ticks);
-
 };

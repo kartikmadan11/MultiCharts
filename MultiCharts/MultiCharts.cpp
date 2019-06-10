@@ -31,10 +31,10 @@ void MultiCharts::DisposeMultiCharts()
 		trainingData = NULL;
 	}
 
-	if (dateArray != NULL)
+	if (dateArrayUNIX != NULL)
 	{
-		delete[] dateArray;
-		dateArray = NULL;
+		delete[] dateArrayUNIX;
+		dateArrayUNIX = NULL;
 	}
 
 	if (testingData != NULL)
@@ -43,10 +43,10 @@ void MultiCharts::DisposeMultiCharts()
 		testingData = NULL;
 	}
 
-	if (testDateArray != NULL)
+	if (testDateArrayUNIX != NULL)
 	{
-		delete[] testDateArray;
-		testDateArray = NULL;
+		delete[] testDateArrayUNIX;
+		testDateArrayUNIX = NULL;
 	}
 
 	if (fileName != NULL)
@@ -80,8 +80,6 @@ void MultiCharts::SetTrainingData(double *trainingData)
 	{
 		this->trainingData[i] = trainingData[i];
 	}
-	//delete trainingData;
-	//trainingData = NULL;
 }
 
 void MultiCharts::InitTestingData(int size)
@@ -96,8 +94,6 @@ void MultiCharts::SetTestingData(double *testingData)
 	{
 		this->testingData[i] = testingData[i];
 	}
-	//delete testingData;
-	testingData = NULL;
 }
 
 void MultiCharts::InitDateArrayUNIX(int size)
@@ -114,45 +110,18 @@ void MultiCharts::SetDateArrayUNIX(long long * dateArray)
 	}
 }
 
-void MultiCharts::InitDateArray(int size)
+void MultiCharts::InitTestDateArrayUNIX(int size)
 {
-	this->dateArraySize = size;
-	this->dateArray = new char[size][DATE_SIZE];
+	this->testDateArrayUNIXSize = size;
+	this->testDateArrayUNIX = new long long[size];
 }
 
-void MultiCharts::SetDateArray(char *dateArray)
+void MultiCharts::SetTestDateArrayUNIX(long long * testDateArray)
 {
-
-	for (int i = 0, k = 0; i < dateArraySize; i++, k += DATE_SIZE - 1)
+	for (int i = 0; i < testDateArrayUNIXSize; i++)
 	{
-		for (int j = 0; j < DATE_SIZE - 1; j++)
-		{
-			this->dateArray[i][j] = dateArray[j + k];
-		}
-		this->dateArray[i][DATE_SIZE - 1] = '\0';
+		this->testDateArrayUNIX[i] = testDateArray[i];
 	}
-	//delete dateArray;
-	//dateArray = NULL;
-}
-
-void MultiCharts::InitTestDateArray(int size)
-{
-	this->testDateArraySize = size;
-	this->testDateArray = new char[size][DATE_SIZE];
-}
-
-void MultiCharts::SetTestDateArray(char *testDateArray)
-{
-	for (int i = 0, k = 0; i < testDateArraySize; i++, k += DATE_SIZE - 1)
-	{
-		for (int j = 0; j < DATE_SIZE - 1; j++)
-		{
-			this->testDateArray[i][j] = testDateArray[j + k];
-		}
-		this->testDateArray[i][DATE_SIZE - 1] = '\0';
-	}
-	//delete testDateArray;
-	testDateArray = NULL;
 }
 
 void MultiCharts::InitVolumeArray(int size)
@@ -239,18 +208,7 @@ double MultiCharts::TrainModel()
 			CPyObject pDate = PyList_New(0);
 
 			for (int i = 0; i < trainingDataSize; i++)
-			{
-				/*char* dateAtPosI = new char[DATE_SIZE];
-				for (int j = 0; j < DATE_SIZE - 1; j++)
-				{
-					dateAtPosI[j] = dateArray[i][j];
-				}
-				//dateAtPosI[DATE_SIZE - 1] = '\0';
-				std::string date(dateAtPosI);
-				const char* c = date.c_str();
-				delete[] dateAtPosI;
-				*/		
-				
+			{	
 				CPyObject pTrainEle = PyFloat_FromDouble(trainingData[i]);
 				CPyObject pDateEle = PyUnicode_FromFormat("%lli", dateArrayUNIX[i]);
 				
@@ -326,28 +284,15 @@ double MultiCharts::TestModel()
 
 			for (int i = 0; i < testingDataSize; i++)
 			{
-				char* dateAtPosI = new char[DATE_SIZE];
-				for (int j = 0; j < DATE_SIZE - 1; j++)
-				{
-					dateAtPosI[j] = testDateArray[i][j];
-				}
-				dateAtPosI[DATE_SIZE - 1] = '\0';
-				std::string date(dateAtPosI);
-				const char* c = date.c_str();
-				delete[] dateAtPosI;
-
 				CPyObject pTestEle = PyFloat_FromDouble(testingData[i]);
-				CPyObject pDateEle = PyUnicode_FromFormat("%s", c);
+				CPyObject pDateEle = PyUnicode_FromFormat("%lli", dateArrayUNIX[i]);
 
 				PyList_Append(pTestingData, pTestEle);
 				PyList_Append(pDate, pDateEle);
 			}
 
-			std::string fileNameString(fileName, fileNameSize);
-			const char* d = fileNameString.c_str();
-
 			CPyObject pTestingWeight = PyFloat_FromDouble(testingWeight);
-			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
+			CPyObject pFileName = PyUnicode_FromFormat("%s", fileName);
 
 			if (pTestingData && pDate && pTestingWeight && pFileName)
 			{
@@ -401,10 +346,7 @@ double* MultiCharts::Predict(int ticks)
 		{
 			// Creating PyObjects Parameters for Predict Function
 
-			std::string fileNameString(fileName, fileNameSize);
-			const char* d = fileNameString.c_str();
-
-			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
+			CPyObject pFileName = PyUnicode_FromFormat("%s", fileName);
 			CPyObject pTicks = Py_BuildValue("i", ticks);
 
 			if (pFileName && pTicks)
