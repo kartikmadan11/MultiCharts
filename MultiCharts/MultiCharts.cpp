@@ -291,8 +291,11 @@ double MultiCharts::TestModel()
 				PyList_Append(pDate, pDateEle);
 			}
 
+			std::string fileNameString(fileName, fileNameSize);
+			const char* d = fileNameString.c_str();
+
 			CPyObject pTestingWeight = PyFloat_FromDouble(testingWeight);
-			CPyObject pFileName = PyUnicode_FromFormat("%s", fileName);
+			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
 
 			if (pTestingData && pDate && pTestingWeight && pFileName)
 			{
@@ -346,7 +349,10 @@ double* MultiCharts::Predict(int ticks)
 		{
 			// Creating PyObjects Parameters for Predict Function
 
-			CPyObject pFileName = PyUnicode_FromFormat("%s", fileName);
+			std::string fileNameString(fileName, fileNameSize);
+			const char* d = fileNameString.c_str();
+
+			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
 			CPyObject pTicks = Py_BuildValue("i", ticks);
 
 			if (pFileName && pTicks)
