@@ -97,7 +97,7 @@ def r2_score(y_true, y_pred):
     return ( 1 - SS_res/(SS_tot + K.epsilon()) )
     
 def train(training_set, unix_date, lr, scale, epochs, momentum, optimizer, file_name):
-    if(type(training_set) == list and type(unix_date) == list and file_name == 'modelLSTM' and len(training_set) == 1000 and type(unix_date[0]) == str):
+    if(type(training_set) == list and type(unix_date) == list):
 
         #Converting unix dates to DateTime
         date = [datetime.fromtimestamp(float(unix)) for unix in unix_date]
@@ -132,8 +132,11 @@ def train(training_set, unix_date, lr, scale, epochs, momentum, optimizer, file_
     else:
         return 110
 
-def test(testing_set, date, testing_weight, file_name):
-    if(type(testing_set) == list):
+def test(testing_set, unix_date, testing_weight, file_name):
+    if(type(testing_set) == list and type(unix_date) == list):
+        
+        #Converting unix dates to DateTime
+        date = [datetime.fromtimestamp(float(unix)) for unix in unix_date]
 
         # Constructing a pandas dataframe for reusability and reference
         df = pd.DataFrame(data = testing_set, columns = ['Feature'], index = date)
