@@ -19,7 +19,7 @@ MultiCharts::~MultiCharts() { }
 
 void MultiCharts::DisposeMultiCharts()
 {
-	if ((bool)Py_IsInitialized)
+	if ((bool)Py_IsInitialized())
 	{
 		int _ = Py_FinalizeEx();
 		Py_Finalize();
@@ -191,7 +191,7 @@ double MultiCharts::TrainModel()
 {	
 	// Importing the .py module
 	CPyObject pModule = PyImport_ImportModule("build");
-	
+
 	PyGILState_STATE gstate = PyGILState_Ensure();
 
 	if (pModule)
