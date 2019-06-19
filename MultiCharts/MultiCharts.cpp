@@ -172,19 +172,9 @@ void MultiCharts::SetOptimizer(int optimizer)
 	this->optimizer = optimizer;
 }
 
-void MultiCharts::SetMomentum(int momentum)
+void MultiCharts::SetMomentum(double momentum)
 {
 	this->momentum = momentum;
-}
-
-void MultiCharts::SetTestingPart(double testingPart)
-{
-	this->testingPart = testingPart;
-}
-
-void MultiCharts::SetTestingWeight(double testingWeight)
-{
-	this->testingWeight = testingWeight;
 }
 
 double MultiCharts::TrainModel()
@@ -294,13 +284,12 @@ double MultiCharts::TestModel()
 			std::string fileNameString(fileName, fileNameSize);
 			const char* d = fileNameString.c_str();
 
-			CPyObject pTestingWeight = PyFloat_FromDouble(testingWeight);
 			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
 
-			if (pTestingData && pDate && pTestingWeight && pFileName)
+			if (pTestingData && pDate && pFileName)
 			{
 				// Receiving return value from the Test Function
-				CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pTestingData, pDate, pTestingWeight, pFileName, NULL);
+				CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pTestingData, pDate, pFileName, NULL);
 
 				if (pValue)
 				{
