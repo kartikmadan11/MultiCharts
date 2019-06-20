@@ -2,60 +2,58 @@
 
 public class MultiCharts
 {
-public:
-	double* trainingData;
-	int trainingDataSize;
+	private:
+		double* trainingData;
+		int trainingDataSize;
 
-	double* testingData;
-	int testingDataSize;
+		double* testingData;
+		int testingDataSize;
 	
-	long long* dateArrayUNIX;
-	int dateArrayUNIXSize;
+		long long* dateArrayUNIX;
+		int dateArrayUNIXSize;
 
-	long long *testDateArrayUNIX;
-	int testDateArrayUNIXSize;
-	
-	long* volumeArray;
-	int volumeArraySize;
+		long long *testDateArrayUNIX;
+		int testDateArrayUNIXSize;
 
-	char* fileName;
-	int fileNameSize;
+		char* fileName;
+		int fileNameSize;
 
-	double learningRate;
-	int epochs;
-	int scale;
-	int optimizer;
-	double momentum;
+		double learningRate;
+		int epochs;
+		int scale;
+		int optimizer;
+		double momentum;
+		double trainScore;
+		double testScore;
 
-	MultiCharts();
-	~MultiCharts();
-	void DisposeMultiCharts();
+	public:
+		MultiCharts();
+		~MultiCharts();
+		void DisposeMultiCharts();
 
-	void InitTrainingData(int size);
-	void SetTrainingData(double* trainingData);
+		void InitTrainingData(int size);
+		void SetTrainingData(double* trainingData);
 
-	void InitTestingData(int size);
-	void SetTestingData(double* testingData);
+		void InitTestingData(int size);
+		void SetTestingData(double* testingData);
 
-	void InitDateArrayUNIX(int size);
-	void SetDateArrayUNIX(long long *dateArray);
+		void InitDateArrayUNIX(int size);
+		void SetDateArrayUNIX(long long *dateArray);
 
-	void InitTestDateArrayUNIX(int size);
-	void SetTestDateArrayUNIX(long long *testDateArray);
+		void InitTestDateArrayUNIX(int size);
+		void SetTestDateArrayUNIX(long long *testDateArray);
 
-	void InitVolumeArray(int size);
-	void SetVolumeArray(long* volume);
+		void InitFileName(int size);
+		void SetFileName(char* fileName);
 
-	void InitFileName(int size);
-	void SetFileName(char* fileName);
+		void SetLearningRate(double learningRate);
+		void SetEpochs(int epochs);
+		void SetScale(int scale);
+		void SetOptimizer(int optimizer);
+		void SetMomentum(double momentum);
 
-	void SetLearningRate(double learningRate);
-	void SetEpochs(int epochs);
-	void SetScale(int scale);
-	void SetOptimizer(int optimizer);
-	void SetMomentum(double momentum);
-
-	double TrainModel();
-	double TestModel();
-	double* Predict(int ticks);
+		double TrainModel();
+		double TestModel();
+		double Evaluate(int metric);
+		double* Predict(int ticks);
 };

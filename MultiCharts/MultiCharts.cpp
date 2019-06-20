@@ -55,12 +55,6 @@ void MultiCharts::DisposeMultiCharts()
 		fileName = NULL;
 	}
 
-	if (volumeArray != NULL)
-	{
-		delete[] volumeArray;
-		volumeArray = NULL;
-	}
-
 	if (this != NULL)
 	{
 		delete this;
@@ -122,19 +116,6 @@ void MultiCharts::SetTestDateArrayUNIX(long long * testDateArray)
 	{
 		this->testDateArrayUNIX[i] = testDateArray[i];
 	}
-}
-
-void MultiCharts::InitVolumeArray(int size)
-{
-	this->volumeArraySize = size;
-	this->volumeArray = new long[size];
-}
-
-void MultiCharts::SetVolumeArray(long* volume)
-{
-	this->volumeArray = volume;
-	//delete[] volume;
-	//volume = NULL;
 }
 
 void MultiCharts::InitFileName(int size)
@@ -300,25 +281,82 @@ double MultiCharts::TestModel()
 				else
 				{
 					PyGILState_Release(gstate);
-					return 0.01;
+					return 1.01;
 				}
 			}
 			else
 			{
 				PyGILState_Release(gstate);
-				return 0.02;
+				return 2.01;
 			}
 		}
 		else
 		{
 			PyGILState_Release(gstate);
-			return 0.03;
+			return 3.01;
 		}
 	}
 	else
 	{
 		PyGILState_Release(gstate);
-		return 0.04;
+		return 4.01;
+	}
+}
+
+double  MultiCharts::Evaluate(int metric)
+{
+	// Importing the .py module
+	CPyObject pModule = PyImport_ImportModule("build");
+
+	PyGILState_STATE gstate = PyGILState_Ensure();
+
+	if (pModule)
+	{
+		// Importing the Predict Function
+		CPyObject pFunc = PyObject_GetAttrString(pModule, "evaluate");
+
+		if (pFunc && PyCallable_Check(pFunc))
+		{
+			// Creating PyObjects Parameters for Predict Function
+			std::string fileNameString(fileName, fileNameSize);
+			const char* d = fileNameString.c_str();
+
+			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
+			CPyObject pMetric = Py_BuildValue("i", metric);
+
+			if (pFileName && pMetric)
+			{
+				// Receiving return value from the Predict Function
+				CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pFileName, pMetric, NULL);
+
+				if (pValue)
+				{
+					double returnVal = PyFloat_AsDouble(pValue);
+					PyGILState_Release(gstate);
+					return returnVal;
+				}
+				else 
+				{
+					PyGILState_Release(gstate);
+					return 1.01;
+				}
+			}
+			else
+			{
+				PyGILState_Release(gstate);
+				return 2.01;
+			}
+		}
+		else
+		{
+			PyGILState_Release(gstate);
+			return 3.01;
+		}
+	}
+	else
+	{
+		PyGILState_Release(gstate);
+		return 4.01;
 	}
 }
 
