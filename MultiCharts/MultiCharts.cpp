@@ -3,6 +3,7 @@
 #include "MultiCharts.h"
 #include "pyhelper.hpp"
 #include "string"
+#include "exception"
 
 //Creating a Python Instance
 CPyInstance pyInstance;
@@ -158,6 +159,11 @@ void MultiCharts::SetMomentum(double momentum)
 	this->momentum = momentum;
 }
 
+void MultiCharts::SetTestingWeight(double testingWeight)
+{
+	this->testingWeight = testingWeight;
+}
+
 double MultiCharts::TrainModel()
 {	
 	// Importing the .py module
@@ -256,7 +262,7 @@ double MultiCharts::TestModel()
 			for (int i = 0; i < testingDataSize; i++)
 			{
 				CPyObject pTestEle = PyFloat_FromDouble(testingData[i]);
-				CPyObject pDateEle = PyUnicode_FromFormat("%lli", dateArrayUNIX[i]);
+				CPyObject pDateEle =  PyUnicode_FromFormat("%lli", dateArrayUNIX[i]);
 
 				PyList_Append(pTestingData, pTestEle);
 				PyList_Append(pDate, pDateEle);
@@ -303,7 +309,7 @@ double MultiCharts::TestModel()
 	}
 }
 
-double  MultiCharts::Evaluate(int metric)
+double* MultiCharts::Evaluate()
 {
 	// Importing the .py module
 	CPyObject pModule = PyImport_ImportModule("build");
@@ -322,41 +328,66 @@ double  MultiCharts::Evaluate(int metric)
 			const char* d = fileNameString.c_str();
 
 			CPyObject pFileName = PyUnicode_FromFormat("%s", d);
-			CPyObject pMetric = Py_BuildValue("i", metric);
+			CPyObject pTestingWeight = PyFloat_FromDouble(testingWeight);
 
-			if (pFileName && pMetric)
+			if (pFileName && pTestingWeight)
 			{
 				// Receiving return value from the Predict Function
-				CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pFileName, pMetric, NULL);
+				CPyObject pValue = PyObject_CallFunctionObjArgs(pFunc, pFileName, pTestingWeight, NULL);
 
 				if (pValue)
 				{
-					double returnVal = PyFloat_AsDouble(pValue);
-					PyGILState_Release(gstate);
-					return returnVal;
+					if (PyList_Check(pValue))
+					{
+						int count = (int)PyList_Size(pValue);
+
+						double* eval = new double[count];
+						CPyObject pTemp;
+
+						for (int i = 0; i < count; i++)
+						{
+							pTemp = PyList_GetItem(pValue, i);
+							eval[i] = PyFloat_AsDouble(pTemp);
+						}
+
+						PyGILState_Release(gstate);
+
+						//double* eval = new double[ticks]{ 1.1, 2.01, 3.22, 4.1, 5.09 };
+						return eval;
+					}
+					else
+					{
+						PyGILState_Release(gstate);						
+						throw "Python does not return a list";
+						return NULL;
+					}
 				}
-				else 
+				else
 				{
 					PyGILState_Release(gstate);
-					return 1.01;
+					throw "Python did not return any values";
+					return NULL;
 				}
 			}
 			else
 			{
 				PyGILState_Release(gstate);
-				return 2.01;
+				throw "Problem in creating Filename and Testing Weight PyObjects";
+				return NULL;
 			}
 		}
 		else
 		{
 			PyGILState_Release(gstate);
-			return 3.01;
+			throw "Function does not exist or is not callable";
+			return NULL;
 		}
 	}
 	else
 	{
 		PyGILState_Release(gstate);
-		return 4.01;
+		throw "Python Module does not exist";
+		return NULL;
 	}
 }
 

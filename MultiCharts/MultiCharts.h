@@ -23,8 +23,7 @@ public class MultiCharts
 		int scale;
 		int optimizer;
 		double momentum;
-		double trainScore;
-		double testScore;
+		double testingWeight;
 
 	public:
 		MultiCharts();
@@ -51,9 +50,10 @@ public class MultiCharts
 		void SetScale(int scale);
 		void SetOptimizer(int optimizer);
 		void SetMomentum(double momentum);
+		void SetTestingWeight(double testingWeight);
 
 		double TrainModel();
 		double TestModel();
-		double Evaluate(int metric);
+		double* Evaluate();
 		double* Predict(int ticks);
 };
