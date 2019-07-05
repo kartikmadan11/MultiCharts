@@ -16,7 +16,7 @@ int main()
 	}
 
 	MultiCharts * multiCharts = new MultiCharts();
-	
+
 	multiCharts->InitTrainingData(65);
 	multiCharts->SetTrainingData(trainingData);
 
@@ -32,8 +32,6 @@ int main()
 	multiCharts->SetScale(100);
 	multiCharts->SetOptimizer(0);
 	multiCharts->SetMomentum(10);
-
-	cout << multiCharts->dateArrayUNIX[21] << endl;
 
 	cout << multiCharts->TrainModel();
 
